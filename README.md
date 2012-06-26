@@ -9,7 +9,7 @@ Just require, call spawn with the server name, and call start with the root path
 var sinxelo = require("./sinxelo");
 
 var server = sinxelo.spawn("main");
-server.start("view", root);
+server.start("view", 80);
 ```
 
 Right now its just a http web serving capable of serving files from a directory. Work in progress!
