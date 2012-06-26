@@ -7,7 +7,7 @@ var path = require('path');
 var fs = require('fs');
 var mime = require('./mime.js');
 
-module.exports = Object.create(events.EventEmitter.prototype, {
+var logic = {
 
 	server: {
 		value: http.createServer()
@@ -43,11 +43,13 @@ module.exports = Object.create(events.EventEmitter.prototype, {
 					var ext = path.extname(file).replace('.', '');
 					var type = mime.type(ext);
 
-					res.statusCode = 200;
+
 
 					if (type) {
 						res.setHeader("Content-Type", type);
 					}
+
+					res.statusCode = 200;
 
 					res.write(data);
 					res.end();
@@ -103,4 +105,20 @@ module.exports = Object.create(events.EventEmitter.prototype, {
 			this.server.listen(port || 80);
 		}
 	}
-});
+};
+
+module.exports = {
+
+	instances: {},
+
+	server: logic,
+
+	spawn: function(name) {
+
+			this.instances[name] = Object.create(events.EventEmitter.prototype, this.server);
+
+			return this.instances[name];
+
+	}
+
+};

@@ -8,8 +8,16 @@ process.on('uncaughtException', function (err, msg, stack) {
 });
 
 
-sinxelo.start('view');
+//sinxelo.start('view');
 
+var server = sinxelo.spawn("main");
+
+server.start("view", 80);
+
+/*
+var server = sinxelo.spawn("second");
+server.start("view", 8080);
+*/
 /*
 var server = http.createServer();
 

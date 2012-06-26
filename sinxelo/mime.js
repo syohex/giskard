@@ -1401,8 +1401,7 @@ var types = {
 	}
 }
 
-
-var mime = {
+module.exports = {
 
 	type: function(extension) {
 
@@ -1431,5 +1430,3 @@ var mime = {
 	}
 
 };
-
-module.exports = mime;
