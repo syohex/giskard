@@ -10,9 +10,13 @@ process.on('uncaughtException', function (err, msg, stack) {
 
 //sinxelo.start('view');
 
-var server = sinxelo.spawn("main");
+var main = sinxelo.spawn("main");
 
-server.start("view", 80);
+main.on('read', function() {
+	console.log(util.inspect(arguments));
+});
+
+main.start("view", 80);
 
 /*
 var server = sinxelo.spawn("second");
