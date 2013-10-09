@@ -3,13 +3,13 @@ sinxelo
 
 A simple nodejs http server.
 
-Just require, call spawn with the server name, and call start with the root path and port:
+Just require and call start with the config path
 
 ```javascript
 var sinxelo = require("./sinxelo");
 
-var server = sinxelo.spawn("main");
-server.start("view", 80);
+sinxelo.start("config.json");
 ```
+In the config you can specify right not the app dir and the http port for the server.
 
 Right now its just a http web serving capable of serving files from a directory. Work in progress!

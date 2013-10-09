@@ -1,223 +1,181 @@
 
-var util = require('util');
-var events = require('events');
-var http = require('http');
-var url = require('url');
-var path = require('path');
-var fs = require('fs');
-var domains = require("domain");
-var mime = require('./mime.js');
+/*jslint node:true, devel: true, plusplus: true, vars: true */
 
-var server = {
+'use strict';
 
-	server: {
-		value: http.createServer()
-	},
+// Imports
+var util = require('util'),
+    cluster = require('cluster'),
+    os = require('os'),
+    fs = require('fs');
 
-	root: {
-		value: ''
-	},
+// General exception handling
+process.on('uncaughtException', function (err, msg, stack) {
+	console.log('Caught exception: ' + err);
+	console.log(err.stack);
+});
 
-	handleError: {
-		enumerable: false,
-		value: function(res, code, msg) {
+// Default values
+var DEFAULT_CONFIG = '/config.json';
+var DEFAULT_INSTANCE = './sinxelo/instance';
 
-			res.writeHead(code);
-			res.write(msg);
-			res.end();
-		}
-	},
+/**
+ * Main interface for the sinxelo server
+ */
+var main = {
 
-	printVar: {
-		enumerable: false,
-		value: function(value) {
+    /**
+     * Load the config.json file and parse it
+     * @method
+     * @private
+     * @param {String} path Path to the file, '/config.json' by default
+     * @param {Function} callback Method to invoke when the file is fully readed
+     */
+    loadConfig: function (path, callback) {
+        
+        fs.readFile(path || DEFAULT_CONFIG, function (err, data) {
+            
+            var config;
+            
+            //TODO: Try to get a better global error handling
+            // Posible file errors
+            if (err) {
+                throw err;
+            }
+            
+            // Posible json errors
+            try {
+                config = JSON.parse(data);
+            } catch (e) {
+                throw e;
+            }
+            
+            callback.call(main, config);
+        });
+    },
+    
+    /**
+     * Initialize the cluster by doing the setup and spawning the workers
+     * @method
+     * @private
+     * @param {Object} config Configuraciton object for the server
+     */
+    initCluster: function (config) {
+        
+        var i;
+        
+        //Configure cluster
+        //TODO: Take a deep look at the config options
+        cluster.setupMaster({exec : DEFAULT_INSTANCE, silent : false});
+        
+        // Control unwanted exits
+        cluster.on("exit", function (worker, code, signal) {
+            if (code !== 0 && worker.suicide !== true) {
+                console.warn("Something go wrong and a worker crashed! (" + code + ", " + signal + ")");
+                cluster.fork({config: JSON.stringify(config)});
+            }
+        });
+        
+        // Spawn workers based on the number os cpus of the machine with the config object
+        for (i = 0; i < os.cpus().length; i++) {
+            cluster.fork({config: JSON.stringify(config)});
+        }
+    },
+    
+    /**
+     * Reload a worker based on the provided index with the config object
+     * @method
+     * @private
+     * @param {Array} workers List of the workers we want to reload
+     * @param {Number} i Index for the worker we need to reload
+     * @parem {Object} config Configuration object for the server
+     */
+    reloadWorker: function (workers, i, config) {
+        
+        var worker;
+            
+        if (i <= 0) {
+            console.log('All workers have been reloaded!');
+            return false;
+        }
 
-			var result = '';
+        console.log('Killing ' + workers[i] + ' worker');
 
-			var values = {
-				'pepito': 'ok',
-				'manolito': 'nice'
-			};
-
-			result = values[value.trim()];
-
-			//console.log('-' + value + '-');
-			//console.log(values);
-
-			return result;
-		}
-	},
-
-	loadTemplates: {
-		enumerable: false,
-		value: function(content, context) {
-
-			var that = this;
-
-			var prints = /<\?\s*(print\s+(.*))\s*\?>/g;
-			var imports = /<\?\s*(import\s+'(.*)')\s*\?>/g;
-
-			/*while (match = prints.exec(content)) {
-				console.log(match[2]);
-			}*/
-
-			result = content.replace(prints, function(match, p1, p2, index, string) {
-				return that.printVar(p2);
-			});
-
-
-			var hasTemplates = false;
-			while (match = imports.exec(content)) {
-				var file = path.join(this.basePath,  match[2]);
-				var str = match[0];
-				hasTemplates = true;
-
-				fs.exists(file, function(exists){
-
-					if (exists) {
-
-						fs.readFile(file, function (err, data) {
-
-
-							if (err) {
-								//context.handleError(res, 500, "Error reading file " + file);
-								result = content.replace(str, '!!!Error reading template ' + file);
-							} else {
-								result = content.replace(str, data.toString("utf-8"));
-							}
-						});
-
-					} else {
-						result = content.replace(str, '');
-					}
-				});
-			}
-
-			console.log(result);
-
-			if (hasTemplates) {
-				return false;
-			} else {
-				return result;	
-			}
-			
-		}
-	},
-
-	showFileContent: {
-		enumerable: false,
-		value: function(res, file, context) {
-
-			var self = this;
-
-			fs.readFile(file, function (err, data) {
-
-				if (err) {
-					context.handleError(res, 500, "Error reading file " + file);
-				} else {
-
-
-					var ext = path.extname(file).replace('.', '');
-					var type = mime.type(ext);
-
-					//context.emit('read', { file: file, type: type, data: data, response: res });
-
-					
-
-					if (type === 'text/html') {
-						var content = data.toString("utf-8");
-						data = context.loadTemplates(content, context);
-					}
-					
-
-
-					if (type) {
-						res.setHeader("Content-Type", type);
-					}
-
-					res.statusCode = 200;
-
-					res.write(data);
-					res.end();
-				}
-			});
-
-
-		}
-	},
-
-	handleRequest: {
-		enumerable: false,
-		value: function(req, res, context) {
-
-			var that = context;
-
-			var urlData = url.parse(req.url, true);
-
-			var href = urlData.href;
-			var query = urlData.query;
-
-			var file = path.join(this.basePath + (href && href !== '/' ? href : '/index.html'));
-
-			
-
-			fs.exists(file, function(exists){
-				if (!exists) {
-
-					if (server.listeners.length > 0) {
-						that.emit('notfound', { file: file, request: req, response: res });
-					} else {
-						that.handleError(res, 404, 'File not found!', context);
-					}
-
-
-				} else {
-
-					that.emit('beforeread', { file: file, request: req, response: res });
-
-					that.showFileContent(res, file, context);
-				}
-			});
-		}
-	},
-
-	start: {
-		value: function(root, port) {
-
-			var self = this;
-
-			
-
-			this.basePath = root;
-
-			this.server.on('request', function onRequest(req, res){ 
-
-				var domain = domains.create();
-				
-				domain.on('error', function(err) {
-					self.handleError(res, 500, err.message);
-					domain.dispose();
-				});
-
-				domain.enter();
-				self.handleRequest(req, res, self) 
-			});
-
-			this.server.listen(port || 80);
-		}
-	}
+        cluster.workers[workers[i]].on("disconnect", function (worker) {
+            console.log(worker.id + " worker shutdown ok.");
+        });
+        
+        cluster.workers[workers[i]].disconnect();
+        
+        worker = cluster.fork({config: config});
+        worker.on("listening", function () {
+            console.log('Replacement worker ' + worker.id + ' online.');
+            
+            i--;
+            main.reloadWorker(i, config);
+        });
+    },
+    
+    /**
+     * Reload all the current workers by invoking reloadWorker method
+     * @method
+     * @private
+     * @param {Object} config
+     */
+    reloadWorkers: function (config) {
+        
+        var workers = Object.keys(cluster.workers),
+            i = workers.length;
+        
+        main.reloadWorker(workers, i, config);
+    },
+    
+    /**
+     * Initialize the server by loading the config and initializing the cluster
+     * @method
+     * @public
+     * @param {String} path Path to the configuration file, '/config.json' by default
+     */
+    init: function (path) {
+        main.loadConfig(path, main.initCluster);
+    },
+    
+    /**
+     * Stops all the current workers
+     * @method
+     * @public
+     * @param {Boolean} force Force to use kill to terminate the process instead of disconnect
+     */
+    stop: function (force) {
+        var workers = Object.keys(cluster.workers),
+            i = 0;
+            
+        for (i = workers.length - 1; i >= 0; i--) {
+            
+            if (force) {
+                workers[i].disconnect();
+            } else {
+                workers[i].kill();
+            }
+        }
+    },
+    
+    /**
+     * Reload all the current workers by reloading the config file and calling reloadWorkers
+     * @method
+     * @public
+     * @param {String} path Path to the config file, '/config.json' by default
+     */
+    reload: function (path) {
+        main.loadConfig(path, main.reloadWorkers);
+    }
 };
 
+/**
+ * Public interface for the server
+ */
 module.exports = {
-
-	instances: {},
-
-	spawn: function(name) {
-
-			this.instances[name] = Object.create(events.EventEmitter.prototype, server);
-
-			return this.instances[name];
-
-	}
-
+    start: main.init,
+    stop: main.stop,
+    reload: main.reload
 };
