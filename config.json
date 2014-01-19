@@ -1,4 +1,7 @@
 {
     "path": "./app",
-    "port": 8080
+    "port": 8081,
+    "debug": true,
+    "debugBreak": false,
+    "debugPorts": [5859]
 }
