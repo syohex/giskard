@@ -1,15 +1,19 @@
 {
-  "name": "1024bytes",
-  "subdomain": "1024bytes",
-  "domains": [
-    "1024bytes.es",
-    "www.1024bytes.es"
-  ],
-  "scripts": {
-    "start": "server.js"
+  "author": "Adrian Seijo",
+  "name": "sinxelo",
+  "description": "Simple node htpp server",
+  "version": "0.1",
+  "repository": {
+    "url": ""
   },
-  "version": "0.0.1-11",
+  "main": "./lib/main",
+  "bin": {
+    "replaceme": "./bin/sinxelo"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
   "engines": {
-    "node": "0.6.x"
+    "node": "*"
   }
 }
