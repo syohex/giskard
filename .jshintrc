@@ -1,0 +1,27 @@
+{
+    "undef": true,
+    "unused": "vars",
+    "bitwise": false,
+    "eqeqeq": true,
+    "forin": true,
+    "immed": true,
+    "latedef": "nofunc",
+    "newcap": true,
+    "noarg": true,
+    "noempty": true,
+    "nonew": true,
+    "quotmark": "single",
+    "maxdepth": 4,
+    "maxstatements": 100,
+    "maxcomplexity": 100,
+    "maxlen": 160,
+
+    "debug": true,
+    "gcl": true,
+
+    "browser": false,
+    "node": true,
+    "devel": true,
+
+    "globals": { "it": true, "expect": true, "describe": true, "beforeEach": true, "xdescribe": true, "xit": true, "afterEach": true, "spyOn": true, "jasmine": true, "runs": true, "waitsFor": true }
+}

@@ -1,41 +1,29 @@
 #!/usr/bin/env node
 
-var sinxelo = require("../lib/main.js"),
-	logger = require("../lib/logger.js"),
-	config = './config.json',
-	arguments = process.argv,
-	argument,
-	key,
-	value,
-	args = {};
+var Logger = require('../lib/util/Logger'),
+	Sinxelo = require('../lib/Sinxelo'),
+	args = require('../lib/util/arguments'),
+	config = '',
+	logger = new Logger(Logger.LEVEL.ERROR), // By default in bin we just use error
+	sinxelo;
 
-// The two first are the node exec and the sinxelo file, we need to parse the rest
-for (var i = 2; i < arguments.length; i++) {
-	argument = arguments[i].trim();
-	next = (i + 1) < arguments.length ? arguments[i + 1].trim() : null;
-
-	if (argument.indexOf('-') === 0 && next && next.indexOf('-') !== 0) {
-		i++; // Next argv if the value
-		args[argument.substring(1)] = arguments[i];
-	} else {
-		args[argument] = true;
-	}
-}
-
+// Show help if the user specifies h or help argvs
 if (args.h || args.help) {
-	logger.log("To use sinxelo just do: sinxelo [-c config.json]. The default path for the config file is the current one");
+	logger.log('\nTo use sinxelo just do: sinxelo [-c config.json].\nThe default path for the config file is the current one.\n');
 	process.exit();
 }
 
+// Load a config file from another location than current if the user specified a c or config argv
 if (args.c || args.config) {
-	config = argv.c || argv.config;	
+	config = args.c || args.config;	
 }
 
-// Initialize the server
-sinxelo.start(config);
+// Initialize and start the server
+sinxelo = new Sinxelo(config);
+sinxelo.start();
 
 // On SIGINT stop sinxelo and exit the process
 // process.on('SIGINT', function () { 
-// 	sinxelo.stop(),
-// 	process.exit();
+//sinxelo.stop(),
+//process.exit();
 // });
