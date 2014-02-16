@@ -6,12 +6,13 @@ The ideas is to implement a web server using just Node Core, including domains, 
 Right know it just has some of the initial versión with some features like cluster and domains, but expect some updates in the near future with more.
 
 
-To begin just require sinxelo and call start with the config path:
+To begin just require sinxelo, isntantitate with a config path and start the server
 
 ```javascript
-var sinxelo = require("./sinxelo");
+var Sinxelo = require("Sinxelo");
 
-sinxelo.start("config.json");
+var sinxelo = new Sinxelo("config.json");
+sinxelo.start();
 ```
 
 The config file is where your settings are defined. Right now it just has a couple of things:
