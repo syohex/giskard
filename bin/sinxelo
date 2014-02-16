@@ -1,7 +1,41 @@
 #!/usr/bin/env node
 
-/*jslint node:true, devel: true, plusplus: true, vars: true */
-var sinxelo = require("../lib/main.js");
+var sinxelo = require("../lib/main.js"),
+	logger = require("../lib/logger.js"),
+	config = './config.json',
+	arguments = process.argv,
+	argument,
+	key,
+	value,
+	args = {};
+
+// The two first are the node exec and the sinxelo file, we need to parse the rest
+for (var i = 2; i < arguments.length; i++) {
+	argument = arguments[i].trim();
+	next = (i + 1) < arguments.length ? arguments[i + 1].trim() : null;
+
+	if (argument.indexOf('-') === 0 && next && next.indexOf('-') !== 0) {
+		i++; // Next argv if the value
+		args[argument.substring(1)] = arguments[i];
+	} else {
+		args[argument] = true;
+	}
+}
+
+if (args.h || args.help) {
+	logger.log("To use sinxelo just do: sinxelo [-c config.json]. The default path for the config file is the current one");
+	process.exit();
+}
+
+if (args.c || args.config) {
+	config = argv.c || argv.config;	
+}
 
 // Initialize the server
-sinxelo.start('./config.json');
+sinxelo.start(config);
+
+// On SIGINT stop sinxelo and exit the process
+// process.on('SIGINT', function () { 
+// 	sinxelo.stop(),
+// 	process.exit();
+// });
