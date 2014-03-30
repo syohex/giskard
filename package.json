@@ -8,7 +8,7 @@
   },
   "main": "./lib/Sinxelo",
   "bin": {
-    "replaceme": "./bin/sinxelo"
+    "sinxelo": "./bin/sinxelo"
   },
   "dependencies": {},
   "devDependencies": {},
