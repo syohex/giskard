@@ -19,11 +19,11 @@ if (args.c || args.config) {
 }
 
 // Initialize and start the server
-sinxelo = new Sinxelo(config);
-sinxelo.start();
+sinxelo = new Sinxelo();
+sinxelo.start(config || "config.json");
 
 // On SIGINT stop sinxelo and exit the process
-// process.on('SIGINT', function () { 
-//sinxelo.stop(),
-//process.exit();
-// });
+process.on('SIGINT', function () { 
+	sinxelo.stop();
+	process.exit();
+});
