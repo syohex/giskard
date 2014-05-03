@@ -1,4 +1,4 @@
-sinxelo
+Giskard
 =======
 
 A simple nodejs http server used to serve static files. 
