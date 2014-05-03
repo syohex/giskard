@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
 var Logger = require('../lib/util/Logger'),
-	Sinxelo = require('../lib/Sinxelo'),
+	Giskard = require('../lib/Main'),
 	args = require('../lib/util/arguments'),
 	config = '',
 	logger = new Logger(Logger.LEVEL.ERROR), // By default in bin we just use error
-	sinxelo;
+	giskard;
 
 // Show help if the user specifies h or help argvs
 if (args.h || args.help) {
-	logger.log('\nTo use sinxelo just do: sinxelo [-c config.json].\nThe default path for the config file is the current one.\n');
+	logger.log('\nTo use sinxelo just do: giskard [-c config.json].\nThe default path for the config file is the current one.\n');
 	process.exit();
 }
 
@@ -19,8 +19,8 @@ if (args.c || args.config) {
 }
 
 // Initialize and start the server
-sinxelo = new Sinxelo(config);
-sinxelo.start();
+giskard = new Giskard(config);
+giskard.start();
 
 // On SIGINT stop sinxelo and exit the process
 // process.on('SIGINT', function () { 
