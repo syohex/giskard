@@ -4,7 +4,7 @@
   "description": "Node htpp server",
   "version": "0.1.1",
   "repository": {
-    "url": ""
+    "url": "https://github.com/kileras/sinxelo"
   },
   "main": "./lib/Giskard",
   "bin": {

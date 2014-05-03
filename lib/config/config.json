@@ -1,9 +1,12 @@
 {
     "path": "./app",
     "port": 8081,
+    "workers": "auto",
 
     "debug": {
         "break": false,
         "ports": [5859]
-    }
+    },
+
+    "folders": []
 }

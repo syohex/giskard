@@ -19,11 +19,11 @@ if (args.c || args.config) {
 }
 
 // Initialize and start the server
-giskard = new Giskard(config);
-giskard.start();
+giskard = new Giskard();
+giskard.start(config || 'config.json');
 
 // On SIGINT stop sinxelo and exit the process
-// process.on('SIGINT', function () { 
-//sinxelo.stop(),
-//process.exit();
-// });
+process.on('SIGINT', function () { 
+	giskard.stop();
+	process.exit();
+});
