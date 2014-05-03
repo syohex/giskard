@@ -9,10 +9,10 @@ Right know it just has some of the initial versión with some features like clus
 To begin just require sinxelo, instantitate and start with a config path
 
 ```javascript
-var Sinxelo = require("Sinxelo");
+var Giskard = require("Giskard");
 
-var sinxelo = new Sinxelo();
-sinxelo.start("config.json");
+var giskard = new Giskard();
+giskard.start("config.json");
 ```
 
 The config file is where your settings are defined. Right now it just has a couple of things:
