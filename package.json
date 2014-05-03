@@ -2,13 +2,13 @@
   "author": "kileras@gmail.com",
   "name": "giskard",
   "description": "Node htpp server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "repository": {
-    "url": "https://github.com/kileras/sinxelo"
+    "url": "https://github.com/kileras/node-giskard"
   },
   "main": "./lib/Giskard",
   "bin": {
-    "sinxelo": "./bin/giskard"
+    "giskard": "./bin/giskard"
   },
   "dependencies": {},
   "devDependencies": {},
