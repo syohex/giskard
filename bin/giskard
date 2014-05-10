@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
 var Logger = require('../lib/util/Logger'),
-	Giskard = require('../lib/Main'),
+	giskard = require('../lib'),
 	args = require('../lib/util/arguments'),
 	config = '',
 	logger = new Logger(Logger.LEVEL.ERROR), // By default in bin we just use error
-	giskard;
+	server;
 
 // Show help if the user specifies h or help argvs
 if (args.h || args.help) {
@@ -15,15 +15,15 @@ if (args.h || args.help) {
 
 // Load a config file from another location than current if the user specified a c or config argv
 if (args.c || args.config) {
-	config = args.c || args.config;	
+	config = args.c || args.config;
 }
 
 // Initialize and start the server
-giskard = new Giskard();
-giskard.start(config || 'config.json');
+server = new giskard.Giskard();
+server.start(config || 'config.json');
 
 // On SIGINT stop sinxelo and exit the process
-process.on('SIGINT', function () { 
-	giskard.stop();
+process.on('SIGINT', function () {
+	server.stop();
 	process.exit();
 });
