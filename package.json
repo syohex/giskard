@@ -2,7 +2,7 @@
     "author": "kileras@gmail.com",
     "name": "giskard",
     "description": "Node htpp server",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "repository": {
         "url": "https://github.com/kileras/giskard"
     },
@@ -10,9 +10,7 @@
     "bin": {
         "giskard": "./bin/giskard"
     },
-    "dependencies": {
-        "handlebars": ">= v2.0.0-alpha.2"
-    },
+    "dependencies": {},
     "devDependencies": {},
     "optionalDependencies": {},
     "engines": {
